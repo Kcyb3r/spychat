@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        #messages {
+            flex: 1;
+            background-color: #242424;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #000000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        .message.sent {
+            margin-left: auto;
+            background-color: #000000;
+            border: 1px solid #4776E6;
+            box-shadow: 0 0 5px rgba(71, 118, 230, 0.2);
+            transform-origin: right;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 5px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #333;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #4776E6, #8E54E9);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent button text from wrapping */
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-preview {
+            max-width: 150px;
+            max-height: 150px;
+        }
+
+        .file-attachment {
+            margin-top: 10px;
+            padding: 8px;
+            background: #111;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .attachment-button {
+            background: none;
+            border: none;
+            color: #4776E6;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .copy-msg-btn {
+            background: none;
+            border: none;
+            color: #4776E6;
+            cursor: pointer;
+            padding: 4px 8px;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            z-index: 2;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .message:hover .copy-msg-btn {
+            opacity: 1;
+        }
+
+        .copy-msg-btn:active {
+            transform: scale(0.95);
+        }
+
+        .message-text {
+            flex: 1;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+
+            .message {
+                max-width: 90%;
+                font-size: 13px;
+            }
+
+            .input-container {
+                padding: 6px;
+                gap: 4px;
+            }
+
+            input {
+                padding: 10px;
+                font-size: 13px;
+                min-width: 0; /* Allow input to shrink */
+                width: 100%;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 13px;
+                min-width: fit-content; /* Ensure button takes minimum required width */
+            }
+
+            .copy-msg-btn {
+                opacity: 1;
+                padding: 8px 12px;
+                font-size: 18px; /* Larger touch target */
+            }
+
+            .file-preview {
+                max-width: 120px;
+                max-height: 120px;
+            }
+
+            strong {
+                font-size: 12px;
+            }
+
+            .attachment-button {
+                padding: 6px;
+                margin-right: 2px;
+            }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 380px) {
+            .message {
+                max-width: 95%;
+                font-size: 12px;
+            }
+
+            .input-container {
+                gap: 3px;
+                padding: 4px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .attachment-button {
+                padding: 4px;
+                margin-right: 1px;
+            }
+
+            input {
+                padding: 8px;
+            }
+        }
+
+        /* Fix for notched phones */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(10px, env(safe-area-inset-left));
+                padding-right: max(10px, env(safe-area-inset-right));
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Improve touch targets */
+        @media (hover: none) {
+            button, .copy-msg-btn, .attachment-button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            input {
+                min-height: 44px;
+            }
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4776E6;
+            font-weight: 600;
+            font-size: 20px;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            background: linear-gradient(45deg, #4776E6, #8E54E9);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Update mobile styles */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .logo {
+                font-size: 14px;
+            }
+        }
+
+        .username-container {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+        }
+
+        #username[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background-color: #2a2a2a;
+        }
+
+        #setUsername {
+            padding: 8px 15px;
+            font-size: 13px;
+        }
+
+        #setUsername.hidden {
+            display: none;
+        }
+
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 18px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            transform: rotate(180deg);
+            color: #ff6666;
+        }
+
+        @media (max-width: 768px) {
+            .reset-btn {
+                padding: 8px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="logo">
+            🕵️‍♂️ <span>SpyChat</span>
+        </div>
+        <div class="username-container">
+            <input type="text" id="username" placeholder="Enter your name..." required>
+            <button id="setUsername" onclick="setUsername()">Set Name</button>
+            <button id="resetUsername" onclick="resetUsername()" class="reset-btn" style="display: none;">
+                🔄
+            </button>
+        </div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="input-container">
+        <button class="attachment-button" onclick="document.getElementById('file-input').click()">
+            ��
+        </button>
+        <input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx">
+        <input type="text" id="message" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        // Function to detect device/browser info
+        function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            let deviceInfo = '';
+
+            // Detect mobile devices
+            if (/iPhone/.test(userAgent)) {
+                deviceInfo = userAgent.match(/iPhone\s*(?:[\w]*\s*[\w]*\s*([\d]+[\_\d]*)?)?/)[0];
+            } else if (/iPad/.test(userAgent)) {
+                deviceInfo = 'iPad';
+            } else if (/Android/.test(userAgent)) {
+                const match = userAgent.match(/Android\s*([\d\.]+)?/);
+                deviceInfo = match ? match[0] : 'Android';
+                // Try to get specific device model
+                const deviceMatch = userAgent.match(/;\s*([^;]*(?:(?!Build)\S)*)/);
+                if (deviceMatch) deviceInfo += ` ${deviceMatch[1].trim()}`;
+            } else {
+                // Desktop browsers
+                if (/Firefox/.test(userAgent)) deviceInfo = 'Firefox';
+                else if (/Chrome/.test(userAgent)) deviceInfo = 'Chrome';
+                else if (/Safari/.test(userAgent)) deviceInfo = 'Safari';
+                else if (/Edge/.test(userAgent)) deviceInfo = 'Edge';
+                else if (/Opera|OPR/.test(userAgent)) deviceInfo = 'Opera';
+                else deviceInfo = 'Unknown Browser';
+                
+                // Add OS info
+                if (/Windows/.test(userAgent)) deviceInfo += ' on Windows';
+                else if (/Mac/.test(userAgent)) deviceInfo += ' on Mac';
+                else if (/Linux/.test(userAgent)) deviceInfo += ' on Linux';
+            }
+            
+            return deviceInfo;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = io(window.location.origin);
+            const messages = document.getElementById('messages');
+            const messageInput = document.getElementById('message');
+            const usernameInput = document.getElementById('username');
+            const setUsernameBtn = document.getElementById('setUsername');
+            const fileInput = document.getElementById('file-input');
+            
+            // Set device info in username placeholder
+            const deviceInfo = getDeviceInfo();
+            
+            // Check for saved username
+            const savedUsername = localStorage.getItem('spychat_username');
+            if (savedUsername) {
+                usernameInput.value = savedUsername;
+                usernameInput.disabled = true;
+                setUsernameBtn.classList.add('hidden');
+                document.getElementById('resetUsername').style.display = 'block';
+            }
+
+            // Function to set username
+            window.setUsername = function() {
+                const username = usernameInput.value.trim();
+                if (username) {
+                    messages.innerHTML = '';
+                    localStorage.setItem('spychat_username', username);
+                    usernameInput.disabled = true;
+                    setUsernameBtn.classList.add('hidden');
+                    document.getElementById('resetUsername').style.display = 'block';
+                    // Join the room with the username
+                    socket.emit('join_room', { username: username });
+                }
+            }
+
+            let currentFile = null;
+            let currentFileName = null;
+            let currentFileType = null;
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentFile = e.target.result;
+                        currentFileName = file.name;
+                        currentFileType = file.type;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            socket.on('message', function(data) {
+                // Only show messages if they're from the same username
+                const currentUsername = localStorage.getItem('spychat_username');
+                if (currentUsername && (data.username === currentUsername || data.sender_id === socket.id)) {
+                    const div = document.createElement('div');
+                    div.className = 'message';
+                    if (data.sender_id === socket.id) {
+                        div.className += ' sent';
+                    }
+                    
+                    const username = document.createElement('strong');
+                    username.textContent = `${data.username} (${data.deviceInfo})`;
+                    username.style.display = 'block';
+                    username.style.marginBottom = '5px';
+                    username.style.color = '#8E54E9';
+                    
+                    div.appendChild(username);
+
+                    const messageContentDiv = document.createElement('div');
+                    messageContentDiv.className = 'message-content';
+
+                    const messageText = document.createElement('span');
+                    messageText.className = 'message-text';
+                    messageText.textContent = data.message;
+
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-msg-btn';
+                    copyButton.innerHTML = '📋';
+                    copyButton.title = 'Copy message';
+                    copyButton.onclick = async function(e) {
+                        e.stopPropagation(); // Prevent event bubbling
+                        try {
+                            // Format the text to copy
+                            const textToCopy = `${data.username}: ${data.message}`;
+                            
+                            // Use modern clipboard API with fallback
+                            if (navigator.clipboard && window.isSecureContext) {
+                                await navigator.clipboard.writeText(textToCopy);
+                            } else {
+                                // Fallback for older browsers or non-HTTPS
+                                const textArea = document.createElement('textarea');
+                                textArea.value = textToCopy;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                try {
+                                    document.execCommand('copy');
+                                } catch (err) {
+                                    console.error('Copy failed:', err);
+                                }
+                                textArea.remove();
+                            }
+                            
+                            // Visual feedback
+                            copyButton.innerHTML = '✓';
+                            copyButton.style.color = '#4CAF50';
+                            
+                            setTimeout(() => {
+                                copyButton.innerHTML = '📋';
+                                copyButton.style.color = '#4776E6';
+                            }, 2000);
+                            
+                        } catch (err) {
+                            console.error('Copy failed:', err);
+                            copyButton.innerHTML = '❌';
+                            copyButton.style.color = '#ff4444';
+                            
+                            setTimeout(() => {
+                                copyButton.innerHTML = '📋';
+                                copyButton.style.color = '#4776E6';
+                            }, 2000);
+                        }
+                    };
+
+                    messageContentDiv.appendChild(messageText);
+                    messageContentDiv.appendChild(copyButton);
+                    div.appendChild(messageContentDiv);
+
+                    if (data.file) {
+                        const fileContainer = document.createElement('div');
+                        fileContainer.className = 'file-attachment';
+
+                        if (data.filetype.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = data.file;
+                            img.className = 'file-preview';
+                            fileContainer.appendChild(img);
+                        } else {
+                            const fileIcon = document.createElement('div');
+                            fileIcon.textContent = '📄';
+                            
+                            const fileName = document.createElement('a');
+                            fileName.href = data.file;
+                            fileName.download = data.filename;
+                            fileName.textContent = data.filename;
+                            fileName.style.color = '#4776E6';
+                            
+                            fileContainer.appendChild(fileIcon);
+                            fileContainer.appendChild(fileName);
+                        }
+                        
+                        div.appendChild(fileContainer);
+                    }
+                    
+                    messages.appendChild(div);
+                    messages.scrollTop = messages.scrollHeight;
+                }
+            });
+
+            // Make sendMessage available globally
+            window.sendMessage = function() {
+                const message = messageInput.value;
+                const username = usernameInput.value || 'Anonymous';
+                
+                if (!username || username === 'Anonymous') {
+                    alert('Please set your username first!');
+                    return;
+                }
+                
+                if (message.trim() || currentFile) {
+                    socket.emit('message', {
+                        message: message,
+                        username: username,
+                        deviceInfo: deviceInfo,
+                        file: currentFile,
+                        filename: currentFileName,
+                        filetype: currentFileType
+                    });
+                    messageInput.value = '';
+                    currentFile = null;
+                    currentFileName = null;
+                    currentFileType = null;
+                    fileInput.value = '';
+                }
+            };
+
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Update resetUsername function
+            window.resetUsername = function() {
+                if (confirm('Are you sure you want to reset your username? This will clear your chat history.')) {
+                    localStorage.removeItem('spychat_username');
+                    usernameInput.value = '';
+                    usernameInput.disabled = false;
+                    setUsernameBtn.classList.remove('hidden');
+                    document.getElementById('resetUsername').style.display = 'none';
+                    messages.innerHTML = '';
+                    // Leave the current room
+                    const oldUsername = usernameInput.value;
+                    if (oldUsername) {
+                        socket.emit('leave_room', { username: oldUsername });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

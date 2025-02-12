@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room - {{ room }}</title>
+    <style>
+        .room-header {
+            position: sticky;
+            top: 0;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .room-code {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .room-code span {
+            background: #000;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .copy-button {
+            background: none;
+            border: none;
+            color: #4776E6;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+
+        .copy-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="room-header">
+        <div class="room-code">
+            Room Code: 
+            <span id="roomCodeText">{{ room }}</span>
+            <button class="copy-button" onclick="copyRoomCode()" title="Copy room code">📋</button>
+        </div>
+        <div style="color: #666;">Share this code with friends to join</div>
+    </div>
+
+    <script>
+        function copyRoomCode() {
+            const roomCode = document.getElementById('roomCodeText').textContent;
+            navigator.clipboard.writeText(roomCode).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.textContent = '✓';
+                setTimeout(() => button.textContent = '📋', 2000);
+            });
+        }
+
+        const socket = io(window.location.origin);
+        // ... rest of your socket code ...
+    </script>
+</body>
+</html> 

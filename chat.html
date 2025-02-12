@@ -1,0 +1,43 @@
+const room = "{{ room }}";
+const username = "{{ name }}";
+
+// Join room on connect
+socket.on('connect', () => {
+    socket.emit('join', { room: room, name: username });
+});
+
+// Handle system messages
+socket.on('system_message', function(message) {
+    const div = document.createElement('div');
+    div.className = 'message system';
+    div.textContent = message;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+function sendMessage() {
+    const message = messageInput.value;
+    
+    if (message.trim() || currentFile) {
+        socket.emit('message', {
+            message: message,
+            username: username,
+            room: room,
+            file: currentFile,
+            filename: currentFileName,
+            filetype: currentFileType
+        });
+        messageInput.value = '';
+        currentFile = null;
+        currentFileName = null;
+        currentFileType = null;
+        document.getElementById('file-input').value = '';
+    }
+}
+
+.message.system {
+    background: rgba(71, 118, 230, 0.1);
+    text-align: center;
+    font-style: italic;
+    border: none;
+} 
