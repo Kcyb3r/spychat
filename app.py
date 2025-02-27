@@ -25,8 +25,8 @@ logging.basicConfig(
 )
 
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN = '7875466140:AAFQvE6YjCC1rezOqMaq-hDLGyusTen9fOg'
-TELEGRAM_CHAT_ID = '6660767908'  # Channel/Group ID where bot will store data
+TELEGRAM_BOT_TOKEN = '####enter-telegram-bot######'
+TELEGRAM_CHAT_ID = '++telegram user id -----!'  # Channel/Group ID where bot will store data
 BOT_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}'
 
 def send_to_telegram(message):
