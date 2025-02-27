@@ -1,0 +1,21 @@
+[Unit]
+Description=SpyChat Server
+After=network.target
+
+[Service]
+Type=simple
+User=keshav
+Group=keshav
+WorkingDirectory=/home/keshav/Music/webcopy/spychat
+Environment=PYTHONUNBUFFERED=1
+Environment=FLASK_APP=app.py
+Environment=FLASK_ENV=production
+ExecStart=/usr/bin/python3 app.py
+Restart=always
+RestartSec=3
+
+StandardOutput=append:/var/log/spychat.log
+StandardError=append:/var/log/spychat.error.log
+
+[Install]
+WantedBy=multi-user.target 
